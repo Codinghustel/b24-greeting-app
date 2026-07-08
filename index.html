@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Developer Greeting</title>
+<script src="//api.bitrix24.com/api/v1/"></script>
+<style>
+  :root{
+    --bg: #0f1115;
+    --panel: #161922;
+    --accent: #5b8cff;
+    --accent-soft: #2a3a66;
+    --text: #eef1f7;
+    --muted: #8b93a7;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: radial-gradient(circle at 20% 20%, #1a1f2b 0%, var(--bg) 60%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+  }
+  .card{
+    background: var(--panel);
+    border: 1px solid #232838;
+    border-radius: 16px;
+    padding: 48px 44px;
+    max-width: 480px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    top:-40px; right:-40px;
+    width:160px; height:160px;
+    background: var(--accent);
+    opacity: 0.12;
+    border-radius: 50%;
+    filter: blur(10px);
+  }
+  .eyebrow{
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  h1{
+    font-size: 30px;
+    line-height: 1.25;
+    margin: 0 0 10px;
+    font-weight: 700;
+  }
+  #name-slot{
+    color: var(--accent);
+  }
+  p.sub{
+    color: var(--muted);
+    font-size: 15px;
+    margin: 0 0 28px;
+  }
+  .meta{
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+    border-top: 1px solid #232838;
+    padding-top: 18px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 14px;
+  }
+  .meta span.k{ color: #596179; }
+  .meta span.v{ color: var(--text); }
+  .pulse{
+    display:inline-block;
+    width:8px; height:8px;
+    border-radius:50%;
+    background:#4ade80;
+    margin-right:6px;
+    box-shadow: 0 0 0 0 rgba(74,222,128,0.6);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow: 0 0 0 0 rgba(74,222,128,0.5); }
+    70%{ box-shadow: 0 0 0 8px rgba(74,222,128,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="eyebrow">Bitrix24 · Local Application</div>
+    <h1>Hey <span id="name-slot">there</span>, good to see you.</h1>
+    <p class="sub">The workspace is up and connected. Build something good today.</p>
+    <div class="meta" id="meta">
+      <span class="k">status</span><span class="v"><span class="pulse"></span>connected</span>
+      <span class="k">domain</span><span class="v" id="domain">—</span>
+      <span class="k">user id</span><span class="v" id="uid">—</span>
+      <span class="k">loaded</span><span class="v" id="time">—</span>
+    </div>
+  </div>
+
+<script>
+  document.getElementById('time').textContent = new Date().toLocaleString();
+
+  function setLocalFallback(){
+    document.getElementById('name-slot').textContent = 'developer';
+    document.getElementById('domain').textContent = window.location.hostname || 'local';
+  }
+
+  try{
+    if (window.BX24){
+      BX24.init(function(){
+        BX24.profile(function(user){
+          var first = (user && user.NAME) ? user.NAME : 'developer';
+          document.getElementById('name-slot').textContent = first;
+          document.getElementById('domain').textContent = BX24.getDomain ? BX24.getDomain() : '—';
+          document.getElementById('uid').textContent = (user && user.ID) ? user.ID : '—';
+        });
+      });
+    } else {
+      setLocalFallback();
+    }
+  } catch(e){
+    setLocalFallback();
+  }
+</script>
+</body>
+</html>
